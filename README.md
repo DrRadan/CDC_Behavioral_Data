@@ -15,9 +15,15 @@ The current version imports the following features: '_STATE', 'AGE', 'EDUCA', '_
 Periodic cross-sectional data. Available for 2003, 2007 and 2011. Here only the subset regarding children’s welfare indexes are included ([National Survey of Children’s Health] (https://www.cdc.gov/nchs/slaits/nsch.htm)). 
 
 There are three functions defined in the R script SLAITS_wrangling_functions:
+
 	a. beautify()
+
 	Extracts features "STATE", "AGEYR_CHILD", "TOTKIDS4","AGEPOS4", "BMICLASS", "POVERTY_LEVELR”, "EDUCATION_LVL","LANGUAGE", "WEIGHT”, “SEX”, and converts codes into human-readable entries
+
 	b. bmi()
+
 	Calculated BMI based on the WEIGHT and HEIGHT (self-reported) values from the SLAITS datasets
+
 	c. data2freq()
+
 	This function used the weights column and created tables that are representative of the population using them
