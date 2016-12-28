@@ -16,14 +16,14 @@ Periodic cross-sectional data. Available for 2003, 2007 and 2011. Here only the 
 
 There are three functions defined in the R script SLAITS_wrangling_functions:
 
-	a. beautify()
+  a. beautify()
 
-	Extracts features "STATE", "AGEYR_CHILD", "TOTKIDS4","AGEPOS4", "BMICLASS", "POVERTY_LEVELR”, "EDUCATION_LVL","LANGUAGE", "WEIGHT”, “SEX”, and converts codes into human-readable entries
+  Extracts features "STATE", "AGEYR_CHILD", "TOTKIDS4","AGEPOS4", "BMICLASS", "POVERTY_LEVELR”, "EDUCATION_LVL","LANGUAGE", "WEIGHT”, “SEX”, and converts codes into human-readable entries
 
-	b. bmi()
+  b. bmi()
 
-	Calculated BMI based on the WEIGHT and HEIGHT (self-reported) values from the SLAITS datasets
+  Calculated BMI based on the WEIGHT and HEIGHT (self-reported) values from the SLAITS datasets
 
-	c. data2freq()
+  c. data2freq()
 
-	This function used the weights column and created tables that are representative of the population using them
+  This function used the weights column and created tables that are representative of the population using them
