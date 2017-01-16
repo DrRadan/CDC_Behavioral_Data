@@ -17,36 +17,46 @@ beautify <- function(dataset, column_list=c("STATE", "AGEYR_CHILD", "TOTKIDS4","
   test <- colnames(dataset) #the colnames of my current table
   
   if (length(grep(diagnostic[1],test))>0) {
-    var1<-c("S1Q01" , "S10Q01","S10Q02", "S10Q03", "S10Q05","C11Q11", "C11Q11A", "C11Q11B") #dataset-specific values to be included in output
-    var2 <- c( "PLANGUAGE", "EDUCATIONR") #dataset-specific values not to be included in output
+    var1<-c("S1Q01" , "S10Q01","S10Q02", "S10Q03", "S10Q05") #dataset-specific values to be included in output
+    var2 <- c( "PLANGUAGE", "EDUCATIONR","C11Q11", "C11Q11A", "C11Q11B") #dataset-specific values not to be included in output
     dots <- lapply(c(column_list,var1, var2), as.name)
     dataset <- dataset %>% group_by_(.dots=dots) %>% summarize(WEIGHT=sum(WEIGHT_I, na.rm=TRUE))
       #ceiling() ensures numbers<0 will be 1 and no decimals
     dataset <- dataset %>% mutate(LANGUAGE=ifelse(is.na(PLANGUAGE)==T | PLANGUAGE==6 | PLANGUAGE == 7, NA, ifelse(PLANGUAGE == 1, "ENG", ifelse(PLANGUAGE== 2,"NENG", "what?")))) %>%
-      mutate(EDUCATION_LVL = ifelse( is.na(EDUCATIONR)==T | EDUCATIONR==6 | EDUCATIONR==7, NA, ifelse(EDUCATIONR==1, "highschool-", ifelse(EDUCATIONR==2, "highschool", ifelse(EDUCATIONR==3, "highschool+", "what?")))))
-    return(dataset[,c(column_list,var1, "EDUCATION_LVL","LANGUAGE", "WEIGHT")])
+      mutate(EDUCATION_LVL = ifelse( is.na(EDUCATIONR)==T | EDUCATIONR==6 | EDUCATIONR==7, NA, ifelse(EDUCATIONR==1, "highschool-", ifelse(EDUCATIONR==2, "highschool", ifelse(EDUCATIONR==3, "highschool+", "what?"))))) %>%
+      mutate(TANF=ifelse(is.na(C11Q11)==T | C11Q11==6 | C11Q11 == 7 | C11Q11 == "P", NA, ifelse(C11Q11 == 0 | C11Q11 == "L", 0, 1))) %>%
+      mutate(SNAP=ifelse(is.na(C11Q11A)==T | C11Q11A==6 | C11Q11A == 7 | C11Q11A == "P", NA, ifelse(C11Q11A == 0 | C11Q11A == "L", 0, 1))) %>%
+      mutate(WIC=ifelse(is.na(C11Q11B)==T | C11Q11B==6 | C11Q11B == 7 | C11Q11B == "P", NA, ifelse(C11Q11B == 0 | C11Q11B == "L", 0, 1)))
+    
+    return(dataset[,c(column_list,var1, "TANF","SNAP","WIC","EDUCATION_LVL","LANGUAGE", "WEIGHT")])
   } 
   else  if (length(grep(diagnostic[2],test))>0) {
-    var1<-c("SEX", "K10Q30", "K10Q31", "K10Q32", "K10Q34","K11Q60", "K11Q61", "K11Q62") #dataset-specific values to be included in output
-    var2 <- c("PLANGUAGE", "EDUC_PARR")    #dataset-specific values not to be included in output
+    var1<-c("SEX", "K10Q30", "K10Q31", "K10Q32", "K10Q34") #dataset-specific values to be included in output
+    var2 <- c("PLANGUAGE", "EDUC_PARR","K11Q60", "K11Q61", "K11Q62")    #dataset-specific values not to be included in output
     dots <- lapply(c(column_list,var1,var2), as.name)
     dataset <- dataset %>% group_by_(.dots=dots) %>% summarize(WEIGHT=sum(NSCHWT, na.rm=TRUE))
     #ceiling() ensures numbers<0 will be 1 and no decimals
     dataset <- dataset %>% mutate(LANGUAGE=ifelse(is.na(PLANGUAGE)==T | PLANGUAGE==6 | PLANGUAGE == 7, NA, ifelse(PLANGUAGE == 1, "ENG", ifelse(PLANGUAGE== 2,"NENG", "what?")))) %>%
-    mutate(EDUCATION_LVL = ifelse( is.na(EDUC_PARR)==T | EDUC_PARR==6 | EDUC_PARR==7, NA, ifelse(EDUC_PARR==1, "highschool-", ifelse(EDUC_PARR==2, "highschool", ifelse(EDUC_PARR==3, "highschool+", "what?")))))
-    return(dataset[,c(column_list,var1, "EDUCATION_LVL","LANGUAGE", "WEIGHT")])
+    mutate(EDUCATION_LVL = ifelse( is.na(EDUC_PARR)==T | EDUC_PARR==6 | EDUC_PARR==7, NA, ifelse(EDUC_PARR==1, "highschool-", ifelse(EDUC_PARR==2, "highschool", ifelse(EDUC_PARR==3, "highschool+", "what?"))))) %>%
+    mutate( TANF=ifelse(is.na(K11Q60)==T | K11Q60==6 | K11Q60 == 7 | K11Q60 == "P", NA, ifelse(K11Q60 == 0 | K11Q60 == "L", 0, 1))) %>%
+    mutate( SNAP=ifelse(is.na(K11Q61)==T | K11Q61==6 | K11Q61 == 7 | K11Q61 == "P", NA, ifelse(K11Q61 == 0 | K11Q61 == "L", 0, 1))) %>%
+    mutate( WIC=ifelse(is.na(K11Q62)==T | K11Q62==6 | K11Q62 == 7 | K11Q62 == "P", NA, ifelse(K11Q62 == 0 | K11Q62 == "L", 0, 1)))
+    
+    return(dataset[,c(column_list,var1, "TANF","SNAP","WIC","EDUCATION_LVL","LANGUAGE", "WEIGHT")])
     
   }
   else  if (length(grep(diagnostic[3],test))>0) {
-    var1<-c("SEX",  "K10Q30", "K10Q31", "K10Q32", "K10Q34","K11Q60", "K11Q61", "K11Q62") #dataset-specific values to be included in output
-    var2 <- c( "EDUC_MOMR", "EDUC_DADR","PLANGUAGE") #dataset-specific values not to be included in output
+    var1<-c("SEX",  "K10Q30", "K10Q31", "K10Q32", "K10Q34") #dataset-specific values to be included in output
+    var2 <- c( "EDUC_MOMR", "EDUC_DADR","PLANGUAGE","K11Q60", "K11Q61", "K11Q62") #dataset-specific values not to be included in output
     dots <- lapply(c(column_list,var1, var2), as.name)
     dataset <- dataset %>% group_by_(.dots=dots) %>% summarize(WEIGHT=sum(NSCHWT, na.rm=TRUE))
     #ceiling() ensures numbers<0 will be 1 and no decimals
     dataset <- dataset %>% mutate(LANGUAGE=ifelse(is.na(PLANGUAGE)==T | PLANGUAGE==6 | PLANGUAGE == 7, NA, ifelse(PLANGUAGE == 1, "ENG", ifelse(PLANGUAGE== 2,"NENG", "what?")))) %>%
       mutate(temp=ifelse(EDUC_MOMR >= EDUC_DADR, EDUC_MOMR, EDUC_DADR)) %>% 
-      mutate(EDUCATION_LVL = ifelse( is.na(temp)==T | temp==6 | temp==7, NA, ifelse(temp==1, "highschool-", ifelse(temp==2, "highschool", ifelse(temp==3, "highschool+", "what?")))))
-    return(dataset[,c(column_list,var1, "EDUCATION_LVL","LANGUAGE", "WEIGHT")])
+      mutate(EDUCATION_LVL = ifelse( is.na(temp)==T | temp==6 | temp==7, NA, ifelse(temp==1, "highschool-", ifelse(temp==2, "highschool", ifelse(temp==3, "highschool+", "what?"))))) %>%
+      mutate( TANF=ifelse(is.na(K11Q60)==T | K11Q60==6 | K11Q60 == 7 | K11Q60 == "P", NA, ifelse(K11Q60 == 0 | K11Q60 == "L", 0, 1)))
+    
+    return(dataset[,c(column_list,var1, "TANF","SNAP","WIC","EDUCATION_LVL","LANGUAGE", "WEIGHT")])
   }
   else {
     print("There is no column WEIGHT_I or NSCHWT in the dataset to summarize. Please input the correct weight column name")
