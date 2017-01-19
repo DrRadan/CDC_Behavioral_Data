@@ -1,9 +1,9 @@
 # CDC_Behavioral_Data
 ##### Python and R functions wrangling CDC public datasets that have been locally downloaded
 
-The first part of the file refers to the specific data set (see bellow).
+The first part of the file name refers to the specific data set (see bellow).
 
-For each dataset there are two files: a _data_exploration file that contains simple script for exploring the downloaded data, and a _wrangling_function file that contains the function to automatically extract pre-selected features and modify the fields so that they make human sense (eg substitute code '7' with 'NA', according to manual). The function files can be easily modified to include more features and change the codes, by adding subroutines.
+For each dataset there are two files:  a _wrangling_function file that contains the function to automatically extract pre-selected features and modify the fields so that they make human sense (eg substitute code '7' with 'NA', according to manual). A _data_exploration file that contains simple script for exploring the downloaded data, containing examples of how to apply the wrangling functions. The function files can be easily modified to include more features and change the codes, by adding subroutines.
 
 ## Datasets
 
@@ -18,12 +18,8 @@ There are three functions defined in the R script SLAITS_wrangling_functions:
 
   a. beautify()
 
-  Extracts features "STATE", "AGEYR_CHILD", "TOTKIDS4","AGEPOS4", "BMICLASS", "POVERTY_LEVELR”, "EDUCATION_LVL","LANGUAGE", "WEIGHT”, “SEX”, and converts codes into human-readable entries
+  Extracts features and converts codes into human-readable entries
 
-  b. bmi()
-
-  Calculated BMI based on the WEIGHT and HEIGHT (self-reported) values from the SLAITS datasets
-
-  c. data2freq()
+  b. data2freq()
 
   This function used the weights column and created tables that are representative of the population using them

@@ -6,9 +6,12 @@ beautify <- function(dataset)
   dataset <- tbl_df(dataset)
   
   #First make "STATES" human-readable
-  states <- c("AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS",
-              "KY","LA","ME","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","MD","MA","MI","MN","MS",
-              "MO","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY")
+ # states <- c("AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS",
+ #             "KY","LA","ME","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","MD","MA","MI","MN","MS",
+ #             "MO","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY")
+  
+  states <- c('alabama','alaska','arizona','arkansas','california','colorado','connecticut','delaware','district of columbia','florida','georgia','hawaii','idaho','illinois','indiana','iowa','kansas','kentucky','louisiana','maine','maryland','massachusetts', 'michigan','minnesota','mississippi','missouri','montana','nebraska','nevada','new hampshire','new jersey','new mexico','new york', 'north carolina',
+              'north dakota','ohio','oklahoma','oregon','pennsylvania','rhode island','south carolina','south dakota','tennessee','texas','utah','vermont', 'virginia','washington','west virginia','wisconsin','wyoming')
   for (i in 1:length(states)){
     a <-which(dataset$STATE==i)
     dataset$STATE[a] <- states[i]
@@ -23,7 +26,7 @@ beautify <- function(dataset)
     var2 <- c("SEX","PLANGUAGE", "EDUC_PARR","K11Q60", "K11Q61", "K11Q62","BMICLASS", "POVERTY_LEVELR")    #dataset-specific values not to be included in output
     dots <- lapply(c(column_list,var2), as.name)
     dataset <- dataset %>% group_by_(.dots=dots) %>% 
-      summarize(WEIGHT=sum(NSCHWT, na.rm=TRUE), COUNTS = length(NSCHWT)) #compress based of selected features
+      summarize(WEIGHT=sum(NSCHWT, na.rm=TRUE), COUNTS = length(NSCHWT)) #compress based of selected features. Useful for increasing speed, but should not count that the final result of this function is compressed
     #ceiling() ensures numbers<0 will be 1 and no decimals
     dataset <- dataset %>% mutate(LANGUAGE=ifelse(is.na(PLANGUAGE)==T | PLANGUAGE==6 | PLANGUAGE == 7, NA, ifelse(PLANGUAGE == 1, "ENG", ifelse(PLANGUAGE== 2,"NENG", "what?")))) %>%
       mutate(EDUCATION_LVL = ifelse( is.na(EDUC_PARR)==T | EDUC_PARR==6 | EDUC_PARR==7, NA, ifelse(EDUC_PARR==1, "highschool-", ifelse(EDUC_PARR==2, "highschool", ifelse(EDUC_PARR==3, "highschool+", "what?"))))) %>%
@@ -44,7 +47,7 @@ beautify <- function(dataset)
     var2 <- c( "SEX","EDUC_MOMR", "EDUC_DADR","PLANGUAGE","K11Q60", "K11Q61", "K11Q62","BMICLASS", "POVERTY_LEVELR", "K2Q03R", "K2Q02R") #dataset-specific values not to be included in output
     dots <- lapply(c(column_list, var2), as.name)
     dataset <- dataset %>% group_by_(.dots=dots) %>% 
-      summarize(WEIGHT=sum(NSCHWT, na.rm=TRUE), COUNTS = length(NSCHWT)) #compress based of selected features
+      summarize(WEIGHT=sum(NSCHWT, na.rm=TRUE), COUNTS = length(NSCHWT)) #compress based of selected features. Useful for increasing speed, but should not count that the final result of this function is compressed
     #ceiling() ensures numbers<0 will be 1 and no decimals
     dataset <- dataset %>% mutate(LANGUAGE=ifelse(is.na(PLANGUAGE)==T | PLANGUAGE==6 | PLANGUAGE == 7, NA, ifelse(PLANGUAGE == 1, "ENG", ifelse(PLANGUAGE== 2,"NENG", "what?")))) %>%
       mutate(temp=ifelse(EDUC_MOMR >= EDUC_DADR, EDUC_MOMR, EDUC_DADR)) %>% 
@@ -67,7 +70,7 @@ beautify <- function(dataset)
     var2 <- c("S1Q01" , "PLANGUAGE", "EDUCATIONR","C11Q11", "C11Q11A", "C11Q11B","BMICLASS", "POVERTY_LEVELR","S2Q03R", "S2Q02R") #dataset-specific values not to be included in output
     dots <- lapply(c(column_list, var2), as.name)
     dataset <- dataset %>% group_by_(.dots=dots) %>% 
-      summarize(WEIGHT=sum(WEIGHT_I, na.rm=TRUE), COUNTS = length(WEIGHT_I))  #compress based of selected features
+      summarize(WEIGHT=sum(WEIGHT_I, na.rm=TRUE), COUNTS = length(WEIGHT_I))  #compress based of selected features. Useful for increasing speed, but should not count that the final result of this function is compressed 
       #ceiling() ensures numbers<0 will be 1 and no decimals
     dataset <- dataset %>% mutate(LANGUAGE=ifelse(is.na(PLANGUAGE)==T | PLANGUAGE==6 | PLANGUAGE == 7, NA, ifelse(PLANGUAGE == 1, "ENG", ifelse(PLANGUAGE== 2,"NENG", "what?")))) %>%
       mutate(EDUCATION_LVL = ifelse( is.na(EDUCATIONR)==T | EDUCATIONR==6 | EDUCATIONR==7, NA, ifelse(EDUCATIONR==1, "highschool-", ifelse(EDUCATIONR==2, "highschool", ifelse(EDUCATIONR==3, "highschool+", "what?"))))) %>%
@@ -90,53 +93,16 @@ beautify <- function(dataset)
   }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-#Calculate and add exact BMI value to existing table, class tbl_df from the dplyr package, produced from function beautify()
-bmi <- function(dataset){
-  require("dplyr")
-  #Calculate BMI
-  vars <- colnames(dataset) #the colnames of my current table
-  if (length(grep("S2Q03R",vars))>0) { #diagnostic of 2003
-    dataset <- dataset %>% mutate(BMI=ifelse(is.na(BMI_category)==T, NA, (S2Q03R*0.45)/(S2Q02R*0.025)^2))
-    vars <- colnames(dataset) # update the colnames list 
-    drop = c("S2Q03R", "S2Q02R")
-    dataset <- dataset[,!vars %in% drop]
-    return(dataset)
-  } 
-  else  if (length(grep("K2Q03R",vars))>0) { #diagnostic of 2007
-    dataset <- dataset %>% mutate(BMI=ifelse(is.na(BMI_category)==T, NA,(K2Q03R*0.45)/(K2Q02R*0.025)^2))
-    vars <- colnames(dataset) # update the colnames list 
-    drop = c("K2Q03R","K2Q02R")
-    dataset <- dataset[,!vars %in% drop]
-    return(dataset)
-  } 
-  else { #bmi calculation is not possible for 2011-2012
-    print("There is no weight and height information in the dataset. If the dataset comes from the 2011-2012 survey it is a known omission. Please input tables from either the 2003 or 2007 surveys")
-  }
-}
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-
-data2freq <- function(dataset){
+data2freq <- function(dataset, var = as.name("COUNTS")){ #possible variables are "COUNTS" and "WEIGHT"{
   require("dplyr")
   column_list=colnames(dataset)
-  var <- c("WEIGHT_I","NSCHWT") #possible, alternative, column names of variables I want to summarize (currently the weights)
   dots <- lapply(column_list, as.name)
-  if (length(grep(var[1],column_list))>0) { 
-    dataset <- dataset %>% group_by_(.dots=dots) %>% summarize(TOT=ceiling(sum(WEIGHT_I, na.rm=TRUE)/100))
-    #ceiling() ensures numbers<0 will be 1 and no decimals
-    dataset <- dataset[,c(column_list, "TOT")]
-    
-    library("splitstackshape")
-    dataset <- expandRows(dataset, "TOT")
-  } 
-  else  if (length(grep(var[2],column_list))>0) {
-    dataset <- dataset %>% group_by_(.dots=dots) %>% summarize(TOT=ceiling(sum(NSCHWT, na.rm=TRUE)/100))
-    dataset <- dataset[,c(column_list,"TOT")]
-    
-    library("splitstackshape")
-    dataset <- expandRows(dataset, "TOT")
-  } 
-  else {
-    print("There is no column WEIGHT_I or NSCHWT in the dataset to summarize. Please input the correct weight column name")
-  }
+  dataset <- dataset %>% group_by_(.dots=dots) %>% summarize(TOT=ceiling(sum(var, na.rm=TRUE)/100))
+  #ceiling() ensures numbers<0 will be 1 and no decimals
+  dataset <- dataset[,c(column_list, "TOT")]
+  
+  library("splitstackshape")
+  dataset <- expandRows(dataset, "TOT")
 }
+ 
